@@ -8,7 +8,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Main {
-    public static final int PORT = 8080;
+    public static final int PORT = 8088;
     public static final int THREADS = 2;
 
 

@@ -44,16 +44,16 @@ public class Worker implements Runnable {
     void handleRequest() {
         try {
             Request request = new Request(socket.getInputStream());
-            String s = request.read();
+            request.read();
             Response response = new Response(socket.getOutputStream(), request);
             response.write();
-        } catch (Throwable ignored) {
-
+        } catch (Throwable e) {
+                e.printStackTrace();
         } finally {
             try {
                 socket.close();
-            } catch (Throwable ignored) {
-
+            } catch (Throwable e) {
+                e.printStackTrace();
             }
         }
         System.err.println("Client processing finished");

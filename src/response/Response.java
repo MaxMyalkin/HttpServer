@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Response {
-    public static final String DOCUMENT_ROOT = "D:\\Projects\\Highload\\WebServer\\document_root";
+    public static final String DOCUMENT_ROOT = "/home/maxim/Projects/HighLoad/WebServer/static";
     public static final Map<String, String> suffixes = new HashMap<String, String>();
 
     private Code code;
@@ -22,15 +22,14 @@ public class Response {
     }
 
     private void fillMap() {
-        suffixes.put("", "content/unknown");
-        suffixes.put(".zip", "application/zip");
         suffixes.put(".jpg", "image/jpeg");
         suffixes.put(".jpeg", "image/jpeg");
-        suffixes.put(".htm", "text/html");
         suffixes.put(".html", "text/html");
-        suffixes.put(".text", "text/plain");
-        suffixes.put(".txt", "text/plain");
-        suffixes.put(".Java", "text/plain");
+        suffixes.put(".js", "application/javascript");
+        suffixes.put(".css", "text/css");
+        suffixes.put(".png", "image/png");
+        suffixes.put(".gif", "image/gif");
+        suffixes.put(".swf", "application/x-shockwave-flash");
     }
 
     public static String makeHeader(Code code, String suffix, int length) {
@@ -41,7 +40,7 @@ public class Response {
                 "Server: WebServer\r\n" +
                 "Content-Type: " + type + "\r\n" +
                 "Content-Length: " + length + "\r\n" +
-                "Connection: close\r\n\r\n";
+                "Connection: keep-alive\r\n\r\n";
     }
 
     public void write(){
@@ -57,9 +56,10 @@ public class Response {
 
             String header = makeHeader(code, request.getSuffix(), bis.available());
             outputStream.write(header.getBytes());
+            outputStream.flush();
             int in;
             byte[] byteArray = new byte[1024 * 50];
-            while ((in = bis.read()) != -1){
+            while ((in = bis.read(byteArray)) != -1){
                 outputStream.write(byteArray, 0, in);
             }
             outputStream.flush();

@@ -3,12 +3,8 @@ package server;
 import request.Request;
 import response.Response;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.concurrent.BlockingQueue;
 
 public class Worker implements Runnable {
 
@@ -44,18 +40,18 @@ public class Worker implements Runnable {
     void handleRequest() {
         try {
             Request request = new Request(socket.getInputStream());
-            request.read();
             Response response = new Response(socket.getOutputStream(), request);
             response.write();
         } catch (Throwable e) {
-                e.printStackTrace();
-        } finally {
+            e.printStackTrace();
+            pool.addWorker(this);
+        } /*finally {
             try {
                 socket.close();
             } catch (Throwable e) {
                 e.printStackTrace();
             }
-        }
+        }*/
         System.err.println("Client processing finished");
     }
 }

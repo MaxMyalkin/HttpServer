@@ -5,7 +5,7 @@ import java.net.Socket;
 
 public class Main {
     public static final int PORT = 9000;
-    public static final int THREADS = 8;
+    public static final int THREADS = 4;
 
     public static void main(String[] args) throws Throwable {
         ServerSocket serverSocket = new ServerSocket(PORT);
@@ -21,3 +21,4 @@ public class Main {
         }
     }
 }
+//TODO лишний слеш в конце путей

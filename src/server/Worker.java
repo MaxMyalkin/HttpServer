@@ -24,34 +24,29 @@ public class Worker implements Runnable {
         while (true) {
             if(socket == null) {
                 try {
-                    System.err.println("Поток ждет");
+                    //System.err.println("Поток ждет");
                     wait();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
-            System.err.println("Начато выполнение");
-            handleRequest();
-            socket = null;
-            pool.addWorker(this);
+            System.err.println("Client");
+            try {
+                handleRequest();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            finally {
+                socket = null;
+                pool.addWorker(this);
+            }
         }
     }
 
-    void handleRequest() {
-        try {
-            Request request = new Request(socket.getInputStream());
-            Response response = new Response(socket.getOutputStream(), request);
-            response.write();
-        } catch (Throwable e) {
-            e.printStackTrace();
-            pool.addWorker(this);
-        } /*finally {
-            try {
-                socket.close();
-            } catch (Throwable e) {
-                e.printStackTrace();
-            }
-        }*/
+    private void handleRequest() throws IOException {
+        Request request = new Request(socket.getInputStream());
+        Response response = new Response(socket.getOutputStream(), request);
+        response.write();
         System.err.println("Client processing finished");
     }
 }

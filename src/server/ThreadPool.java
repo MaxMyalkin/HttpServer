@@ -20,29 +20,30 @@ public class ThreadPool {
 
     public void addWorker(Worker worker) {
         workers.add(worker);
-        if(queue != null && !queue.isEmpty()) {
-            handleSocket(queue.poll());
-            System.err.println("Воркер взял задачу после добавления в очередь");
-        }
+        handleSocket();
+        //System.err.println("Воркер взял задачу после добавления в очередь");
     }
 
-    public void handleSocket(Socket socket) {
-        if(workers != null && !workers.isEmpty())
+    public void handleSocket() {
             try {
-                workers.poll().setSocket(socket);
+                Worker w = workers.poll();
+                Socket s = queue.poll();
+                if(w != null && s != null)
+                    w.setSocket(s);
+                else {
+                    if(w != null)
+                        workers.add(w);
+                    if(s != null)
+                        queue.add(s);
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
     }
 
     public void addSocket(Socket socket) {
-        if(!workers.isEmpty()) {
-            handleSocket(socket);
-            System.err.println("Сразу взял");
-        }
-        else {
             queue.add(socket);
-            System.err.println("Сокет в очереди");
-        }
+            handleSocket();
+            //System.err.println("Сразу взял");
     }
 }

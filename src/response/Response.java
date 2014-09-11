@@ -109,6 +109,8 @@ public class Response {
     }
 
     public void write() {
+        if(request.getMethod() == null)
+            return;
         BufferedInputStream bis;
         switch (request.getMethod()) {
             case "GET":
@@ -117,9 +119,7 @@ public class Response {
                 break;
             case "HEAD":
                 bis = getFileStream(request.getPath());
-                writeFile(bis, true);/*
-                code = new Code(200);
-                writeHeader(request.getSuffix(), 0);*/
+                writeFile(bis, true);
                 break;
             default:
                 code = new Code(405);

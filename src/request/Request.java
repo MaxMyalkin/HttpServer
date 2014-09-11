@@ -31,9 +31,11 @@ public class Request {
 
     public void read() throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+        StringBuilder builder = new StringBuilder();
         while(true) {
             String s = br.readLine();
             if(s == null || s.trim().length() == 0) {
+                System.out.println(builder.toString());
                 return;
             }
             if(!s.contains(":")) {
@@ -51,6 +53,7 @@ public class Request {
                     this.suffix = path.substring(suffixIdx, path.length());
                 }
             }
+            builder.append(s).append(" ");
         }
     }
 }

@@ -1,7 +1,33 @@
 package handlers;
 
-/**
- * Created by maxim on 12.09.14.
- */
-public class SocketReadHandler {
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.AsynchronousSocketChannel;
+import java.nio.channels.CompletionHandler;
+
+public class SocketReadHandler<K, V> implements CompletionHandler<K, V> {
+
+    private ByteBuffer buffer;
+    private AsynchronousSocketChannel socketChannel;
+
+    public SocketReadHandler(ByteBuffer buffer, AsynchronousSocketChannel socketChannel) {
+        this.socketChannel = socketChannel;
+        this.buffer = buffer;
+    }
+
+    @Override
+    public void completed(K result, V attachment) {
+        try {
+            Handler handler = new Handler(new String(buffer.array()), socketChannel);
+            handler.parseRequest();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Override
+    public void failed(Throwable exc, V attachment) {
+
+    }
 }

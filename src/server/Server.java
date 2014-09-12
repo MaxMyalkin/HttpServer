@@ -1,26 +1,36 @@
 package server;
 
 import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.nio.channels.ServerSocketChannel;
-import java.nio.channels.SocketChannel;
+import java.nio.channels.AsynchronousServerSocketChannel;
+import java.nio.channels.AsynchronousSocketChannel;
+import java.nio.channels.CompletionHandler;
 
 public class Server {
     public static final int PORT = 9000;
     public static final int THREADS = 4;
 
     public static void main(String[] args) throws Throwable {
-        ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
-        ThreadPool pool = new ThreadPool(THREADS);
-        serverSocketChannel.socket().bind(new InetSocketAddress(PORT));
-        serverSocketChannel.configureBlocking(false);
 
-        while(true){
-            SocketChannel socketChannel = serverSocketChannel.accept();
-            if(socketChannel != null){
-                Socket s = socketChannel.socket();
-                pool.addSocket(s);
+        final AsynchronousServerSocketChannel server =
+                AsynchronousServerSocketChannel.open().bind(new InetSocketAddress(PORT));
+
+        final ThreadPool pool = new ThreadPool(THREADS);
+
+        server.accept(null, new CompletionHandler<AsynchronousSocketChannel, Void>() {
+            @Override
+            public void completed(AsynchronousSocketChannel channel, Void a) {
+                server.accept(null, this);
+                pool.addSocketChannel(channel);
             }
+
+            @Override
+            public void failed(Throwable exc, Void a) {
+
+            }
+
+        });
+
+        while (true) {
         }
         /*while (true) {
             try {

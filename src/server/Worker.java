@@ -1,15 +1,15 @@
 package server;
 
-import request.Request;
-import response.Response;
+import handlers.SocketReadHandler;
 
 import java.io.IOException;
-import java.net.Socket;
+import java.nio.ByteBuffer;
+import java.nio.channels.AsynchronousSocketChannel;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Worker implements Runnable {
-
-    private Socket socket;
+    public static final int TIMEOUT = 100;
+    private AsynchronousSocketChannel channel;
     private ThreadPool pool;
     private AtomicInteger atomicInteger = new AtomicInteger(1);
 
@@ -17,16 +17,15 @@ public class Worker implements Runnable {
         this.pool = pool;
     }
 
-    public synchronized void setSocket(Socket socket) throws IOException {
-        this.socket = socket;
+    public synchronized void setChannel(AsynchronousSocketChannel channel) throws IOException {
+        this.channel = channel;
         notify();
     }
 
     public synchronized void run() {
         while (true) {
-            if(socket == null) {
+            if(channel == null) {
                 try {
-                    //System.err.println("Поток ждет");
                     wait();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -38,16 +37,20 @@ public class Worker implements Runnable {
                 e.printStackTrace();
             }
             finally {
-                socket = null;
+                channel = null;
                 pool.addWorker(this);
             }
         }
     }
 
     private void handleRequest() throws IOException {
-        Request request = new Request(socket.getInputStream());
-        Response response = new Response(socket.getOutputStream(), request);
-        response.write();
+        try {
+            ByteBuffer buffer = ByteBuffer.allocate(1024 * 10);
+            channel.read(buffer, TIMEOUT, new SocketReadHandler<Integer, Integer>(buffer, channel));
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 }

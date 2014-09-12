@@ -1,13 +1,13 @@
 package server;
 
 import java.io.IOException;
-import java.net.Socket;
+import java.nio.channels.AsynchronousSocketChannel;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ThreadPool {
     private final ConcurrentLinkedQueue<Worker> workers = new ConcurrentLinkedQueue<>();
-    private final ConcurrentLinkedQueue<Socket> queue = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<AsynchronousSocketChannel> channels = new ConcurrentLinkedQueue<>();
     private final Object lock = new Object();
     AtomicInteger atomicInteger = new AtomicInteger(1);
     public ThreadPool(int numberThreads) throws Throwable {
@@ -26,15 +26,15 @@ public class ThreadPool {
     public void handleSocket() {
         try {
             Worker w = workers.poll();
-            Socket s = queue.poll();
-            if (w != null && s != null)
-                w.setSocket(s);
+            AsynchronousSocketChannel ch = channels.poll();
+            if (w != null && ch != null)
+                w.setChannel(ch);
             else {
-                if (w == null) {
-                    queue.add(s);
+                if (w == null && ch != null) {
+                    channels.add(ch);
                     System.out.println("Socket returned");
                 }
-                if (s == null) {
+                if (ch == null && w != null) {
                     workers.add(w);
                     System.out.println("Worker returned");
                 }
@@ -45,8 +45,8 @@ public class ThreadPool {
         }
     }
 
-    public synchronized void addSocket(Socket socket) {
-            queue.add(socket);
+    public synchronized void addSocketChannel(AsynchronousSocketChannel channel) {
+            channels.add(channel);
             handleSocket();
     }
 }

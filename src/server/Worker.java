@@ -5,11 +5,13 @@ import response.Response;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Worker implements Runnable {
 
     private Socket socket;
     private ThreadPool pool;
+    private AtomicInteger atomicInteger = new AtomicInteger(1);
 
     public Worker(ThreadPool pool) {
         this.pool = pool;
@@ -30,7 +32,6 @@ public class Worker implements Runnable {
                     e.printStackTrace();
                 }
             }
-            System.err.println("Client");
             try {
                 handleRequest();
             } catch (IOException e) {
@@ -47,6 +48,6 @@ public class Worker implements Runnable {
         Request request = new Request(socket.getInputStream());
         Response response = new Response(socket.getOutputStream(), request);
         response.write();
-        System.err.println("Client processing finished");
+
     }
 }

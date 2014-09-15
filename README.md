@@ -1,4 +1,5 @@
-WebServer
+Http Server
 =========
 
-WebServer
+Synchronous HTTP Server. 
+Technopark Highload project.

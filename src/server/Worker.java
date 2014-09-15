@@ -24,7 +24,6 @@ public class Worker implements Runnable {
         while (true) {
             if(socket == null) {
                 try {
-                    //System.err.println("Поток ждет");
                     wait();
                 } catch (InterruptedException e) {
                     e.printStackTrace();

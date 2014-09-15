@@ -1,8 +1,6 @@
 package response;
 
-
 import request.Request;
-
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -34,7 +32,6 @@ public class Response {
         if(type == null)
             type = "content/unknown";
         String header = "HTTP/1.1 " + code.getNumeric() + " " + code.getTranscript() + "\r\n" +
-                "Server: WebServer\r\n" +
                 "Date: " + getTime() + "\r\n" +
                 "Content-Type: " + type + "\r\n" +
                 "Content-Length: " + length + "\r\n" +
